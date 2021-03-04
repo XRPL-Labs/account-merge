@@ -1,5 +1,4 @@
 <template>
-    {{ test.account }}
     <Header />
     <div>
         <p>{{ $t("start.description") }}</p>
@@ -44,7 +43,7 @@ export default {
         }
     },
     async mounted() {
-        this.ready = true
+        // Todo If token not avaiable try again with method
         try {
             const res = await axios({
                 method: 'get',
@@ -55,11 +54,12 @@ export default {
             console.error(e)
             this.error = e
         }
+        this.ready = true
     },
     methods: {
         next() {
-            window.history.pushState('prop', 'title', '/wizard')
-            const popStateEvent = new PopStateEvent('popstate', { state: 'state' })
+            window.history.pushState('this.test', 'meta', '/wizard')
+            const popStateEvent = new PopStateEvent('popstate', { state: this.test })
             dispatchEvent(popStateEvent)
         }
     }

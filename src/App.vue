@@ -2,7 +2,7 @@
     <div class="xapps-wrapper">
         <div class="container pt-2">
             <keep-alive>
-                <component :is="currentComponent" />
+                <component :state="state" :is="currentComponent" />
             </keep-alive>
         </div>
     </div>
@@ -25,7 +25,8 @@ export default {
     },
     data() {
         return {
-            currentRoute: '/'
+            currentRoute: '/',
+            state: {}
         }
     },
     computed: {
@@ -37,6 +38,7 @@ export default {
     mounted() {
         window.addEventListener('popstate', (event) => {
             this.currentRoute = window.location.pathname
+            this.state = event.state
             console.log("location: " + document.location + ", state: " + JSON.stringify(event.state))
         })
     }
