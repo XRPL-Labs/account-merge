@@ -12,8 +12,8 @@
         "paymentOfAmount": "The payment of %{value%} %{token} has been sent",
         "step_0": {
             "header": "Step 1",
-            "body": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. A, cumque.",
-            "button": "Next Step"
+            "body": "Select the account which you wish to delete",
+            "button": "Select Account"
         },
         "step_1": {
             "header": "Step 2",
@@ -24,6 +24,9 @@
             "header": "Step 3",
             "body": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. A, cumque.",
             "button": "Next Step"
+        },
+        "error": {
+            "failed": "Failed to fetch"
         }
     }
 }

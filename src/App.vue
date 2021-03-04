@@ -25,20 +25,29 @@ export default {
     },
     data() {
         return {
-            currentRoute: window.location.pathname,
+            currentRoute: '/'
         }
     },
     computed: {
         currentComponent() {
-            return routes[this.currentRoute] || { template: '<p>Not Found 404</p>' }
+            // Todo 404?
+            return routes[this.currentRoute] || Start
         }
+    },
+    mounted() {
+        window.addEventListener('popstate', (event) => {
+            this.currentRoute = window.location.pathname
+            console.log("location: " + document.location + ", state: " + JSON.stringify(event.state))
+        })
     }
 }
 </script>
 
 <style>
+@import url('https://use.typekit.net/iqo4nny.css');
+
 #app {
-    font-family: Avenir, Helvetica, Arial, sans-serif;
+    font-family: proxima-nova, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }

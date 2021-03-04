@@ -6,10 +6,10 @@ import './assets/css/xapps-dist.css'
 import './assets/css/xapps-routed-dist.css'
 
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faArrowRight, faCheck, faLock } from '@fortawesome/free-solid-svg-icons'
+import { faArrowRight, faCheck, faLock, faCreditCard } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-library.add(faArrowRight, faCheck, faLock)
+library.add(faArrowRight, faCheck, faLock, faCreditCard)
 
 const app = createApp(App)
 
@@ -26,4 +26,11 @@ const i18n = createI18n({
 
 app.use(i18n)
 app.component('fa', FontAwesomeIcon)
+
+const urlParams = new URLSearchParams(window.location.search)
+const token = urlParams.get('xAppToken')
+
+app.config.globalProperties.token = token
+app.config.globalProperties.endpoint = 'https://xappsbackendforxumm.loca.lt'
+
 app.mount('#app')
