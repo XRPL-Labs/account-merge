@@ -1,4 +1,5 @@
 <template>
+    {{ state.nodetype }}
     <Header />
     <div class="vertical-wizard">
         <ul>
@@ -10,6 +11,7 @@
                     <span class="desc d-block">
                         {{ $t(`wizard.step_${index}.body`) }}
                         {{ account }}
+                        {{ destination }}
                         <a @click="next()" v-if="index === activeIndex" class="d-block shadow py-1 btn-block text-white btn btn-lg btn-primary mt-3" :class="{ disabled: busy }">
                             {{ $t(`wizard.step_${index}.button`) }}
                             <fa v-if="!busy" :icon="['fas', 'arrow-right']"/>
@@ -21,7 +23,6 @@
         </ul>
     </div>
     <Alert v-if="error || msg" type="danger" :msg="msg"/>
-    {{ token }}
 </template>
 
 <script>
@@ -32,6 +33,7 @@ import Alert from '@/components/Alert.vue'
 
 export default {
     components: { Header, Spinner, Alert },
+    props: ['state'],
     data() {
         return {
             activeIndex: 0,
@@ -39,7 +41,8 @@ export default {
             busy: false,
             error: false,
             msg: '',
-            account: ''
+            account: '',
+            destination: ''
         }
     },
     methods: {
@@ -52,15 +55,68 @@ export default {
             }
             return obj
         },
+        openSignRequest(uuid) {
+            if (typeof window.ReactNativeWebView === 'undefined') throw new Error('Error getting object from React Native')
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+                command: 'openSignRequest',
+                uuid: uuid
+            }))
+        },
         ws(url) {
             return new Promise((resolve, reject) => {
                 const socket = new WebSocket(url)
                 socket.onmessage = msg => {
                     const data = JSON.parse(msg.data)
                     if (data.signed) {
+                        // if user signs the reques 
+                        resolve(data)
+                        socket.close()
+                    } else if(data.signed === false) {
+                        // If user closes the sign request
+                        reject(data)
+                        socket.close()
+                    }
+                }
+                socket.onclose = msg => {
+                    reject(msg)
+                }
+                socket.onerror = e => {
+                    reject(e)
+                    socket.close()
+                }
+            })
+        },
+        getWebSocketUrl(nodetype) {
+            switch (nodetype) {
+                case "MAINNET":
+                    return 'wss://xrplcluster.com'
+                case "TESTNET":
+                    return 'wss://testnet.xrpl-labs.com'
+            }
+            return 'wss://xrplcluster.com'
+        },
+        accountInfo(account) {
+            const command = {
+                id: 666,
+                command: "account_objects",
+                account: account,
+                ledger_index: "validated",
+                deletion_blockers_only: true,
+                limit: 10
+            }
+            return new Promise((resolve, reject) => {
+                const socket = new WebSocket(this.getWebSocketUrl(this.state.nodetype))
+                socket.onopen = event => {
+                    socket.send(JSON.stringify(command))
+                }
+                socket.onmessage = msg => {
+                    const data = JSON.parse(msg.data)
+                    if (data.error) reject(data)
+                    if (data.id == 666) {
                         resolve(data)
                         socket.close()
                     }
+                    this.msg = data
                 }
                 socket.onclose = msg => {
                     reject(msg)
@@ -84,14 +140,14 @@ export default {
                             }
                         }
                         const res = await axios.post(`${this.endpoint}/payload`, payload)
-                        if (typeof window.ReactNativeWebView === 'undefined') throw new Error('Error getting object from React Native')
-                        window.ReactNativeWebView.postMessage(JSON.stringify({
-                            command: 'openSignRequest',
-                            uuid: res.data.uuid
-                        }))
+                        this.openSignRequest(res.data.uuid)
                         const status = await this.ws(res.data.refs.websocket_status)
                         const result = await axios.get(`${this.endpoint}/payload/${status.payload_uuidv4}`)
                         this.account = result.data.response.account
+
+                        const test = await this.accountInfo(this.account)
+                        if (test.result.account_objects.length >= 1) throw new Error('There are account objects that prevents you from deleting this account')
+                        this.msg = test
                     } catch(e) {
                         this.error = true
                         this.msg = e
@@ -99,28 +155,45 @@ export default {
                     }
                     break
                 case 1:
-
-                    // try {
-                    //     const res = await axios({
-                    //         method: 'post',
-                    //         url: 'https://xumm.app/api/v1/platform/payload',
-                    //         data : {
-                    //             user_token: "c5bc4ccc-28fa-4080-b702-0d3aac97b993",
-                    //             txjson: {
-                    //                 TransactionType: "AccountDelete",
-                    //                 Account: "rXXX",
-                    //                 Destination: "rXXX",
-                    //                 // DestinationTag: null
-                    //             }
-                    //         }
-                    //     })
-                    // } catch (e) {
-                    //     this.error = true
-                    //     console.log(e)
-                    // }
+                    try {
+                        const payload = {
+                            user_token: this.token,
+                            txjson: {
+                                TransactionType: "SignIn"
+                            }
+                        }
+                        const res = await axios.post(`${this.endpoint}/payload`, payload)
+                        this.openSignRequest(res.data.uuid)
+                        const status = await this.ws(res.data.refs.websocket_status)
+                        const result = await axios.get(`${this.endpoint}/payload/${status.payload_uuidv4}`)
+                        this.destination = result.data.response.account
+                    } catch(e) {
+                        this.error = true
+                        this.msg = e
+                        console.log(e)
+                    }
                     break
                 case 2:
-                    console.log('twee')
+                    try {
+                        const payload = {
+                            user_token: this.token,
+                            txjson: {
+                                TransactionType: "AccountDelete",
+                                Account: this.account,
+                                Destination: this.destination,
+                                // DestinationTag: null
+                            }
+                        }
+                        const res = await axios.post(`${this.endpoint}/payload`, payload)
+                        this.openSignRequest(res.data.uuid)
+                        const status = await this.ws(res.data.refs.websocket_status)
+                        const result = await axios.get(`${this.endpoint}/payload/${status.payload_uuidv4}`)
+                        this.msg = result.data.response.dispatched_result
+                    } catch (e) {
+                        this.error = true
+                        console.log(e)
+                        this.msg = e
+                    }
                     break
             }
             this.busy = false

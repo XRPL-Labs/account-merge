@@ -17,12 +17,12 @@
         },
         "step_1": {
             "header": "Step 2",
-            "body": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. A, cumque.",
+            "body": "Sign the destination account.",
             "button": "Next Step"
         },
         "step_2": {
             "header": "Step 3",
-            "body": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. A, cumque.",
+            "body": "Sign the delete account transaction",
             "button": "Next Step"
         },
         "error": {
