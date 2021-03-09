@@ -1,15 +1,15 @@
 {
     "start": {
         "title": "Account Merge",
-        "subtitle": "Merge one account into another to have acces to the XRP reserve",
-        "description": "This xApp will help you to merge two accounts in XUMM",
+        "subtitle": "Merge one account into another to retrieve the XRP reserve",
+        "description": "This xApp will help you merge two accounts in XUMM",
         "list_header": "To continue you need:",
-        "list_item_1": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. A, cumque.",
-        "list_item_2": "Nullam viverra purus tincidunt odio ullamcorper consectetur sit amet non felis.",
+        "list_item_1": "The account you want to delete that has no obligations",
+        "list_item_2": "A destination account",
         "button": "I'm ready, continue"
     },
     "wizard": {
-        "paymentOfAmount": "The payment of %{value%} %{token} has been sent",
+        "paymentOfAmount": "DELETE ME PLEASE!!! The payment of %{value%} %{token} has been sent",
         "step_0": {
             "header": "Step 1",
             "body": "Select the account which you wish to delete",
@@ -25,8 +25,28 @@
             "body": "Sign the delete account transaction",
             "button": "Next Step"
         },
+        "success": "Your account has been successfully merged",
         "error": {
-            "failed": "Failed to fetch"
+            "reactNative": "this webpage is not supported",
+            "failed": "Failed to fetch",
+            "closed": "closed a sign request",
+            "websocket": "A problem with the websocket connection",
+            "403": "Access denied 403",
+            "hasObjects": "There are account objects that prevents you from deleting this account",
+            "equalAccounts": "The accounts you selected are the same",
+
+            "invalidParams": "One or more fields are specified incorrectly, or one or more required fields are missing.",
+            "lgrNotFound": "The ledger specified by the ledger_hash or ledger_index does not exist, or it does exist but the server does not have it.",
+            "actNotFound": "The Address specified in the account field of the request does not correspond to an account in the ledger.",
+
+            "temDISABLED": "Occurs if the DeletableAccounts amendment is not enabled.",
+            "temDST_IS_SRC": "Occurs if the Destination matches the sender of the transaction (Account field).",
+            "tecDST_TAG_NEEDED": "Occurs if the Destination account requires a destination tag, but the DestinationTag field was not provided.",
+            "tecNO_DST": "Occurs if the Destination account is not a funded account in the ledger.",
+            "tecNO_PERMISSION":	"Occurs if the Destination account requires deposit authorization and the sender is not preauthorized.",
+            "tecTOO_SOON": "Occurs if the sender's Sequence number is too high. The transaction's Sequence number plus 256 must be less than the current Ledger Index.",
+            "tecHAS_OBLIGATIONS": "Occurs if the account to be deleted is connected to objects that cannot be deleted in the ledger. (This includes objects created by other accounts, such as escrows.)",
+            "tefTOO_BIG": "Occurs if the sending account is linked to more than 1000 objects in the ledger. The transaction could succeed on retry if some of those objects were deleted separately first."
         }
     }
 }

@@ -1,17 +1,14 @@
 <template>
-    {{ state.nodetype }}
     <Header />
     <div class="vertical-wizard">
         <ul>
             <li v-for="(step, index) in steps" :class="getStepClass(index)" :key="index">
-                <a>
+                <a @click="changeIndex(index)">
                     {{ $t(`wizard.step_${index}.header`) }}
                     <fa v-if="index < activeIndex" class="ico ico-green" :icon="['fa', 'check']"></fa>
                     <fa v-if="index > activeIndex" class="ico ico-muted" :icon="['fa', 'lock']"></fa>
                     <span class="desc d-block">
                         {{ $t(`wizard.step_${index}.body`) }}
-                        {{ account }}
-                        {{ destination }}
                         <a @click="next()" v-if="index === activeIndex" class="d-block shadow py-1 btn-block text-white btn btn-lg btn-primary mt-3" :class="{ disabled: busy }">
                             {{ $t(`wizard.step_${index}.button`) }}
                             <fa v-if="!busy" :icon="['fas', 'arrow-right']"/>
@@ -21,8 +18,8 @@
                 </a>
             </li>
         </ul>
+        <Alert v-if="error || msg" type="danger" :msg="msg"/>
     </div>
-    <Alert v-if="error || msg" type="danger" :msg="msg"/>
 </template>
 
 <script>
@@ -37,6 +34,7 @@ export default {
     data() {
         return {
             activeIndex: 0,
+            // Array for steps is only used for loop
             steps: ['', '', ''],
             busy: false,
             error: false,
@@ -45,7 +43,14 @@ export default {
             destination: ''
         }
     },
+    mounted() {
+        // axios defaults is not working
+        axios.defaults = { headers: { Authorization: this.state.token } }
+    },
     methods: {
+        changeIndex(index) {
+            if (this.activeIndex > index) this.activeIndex = index
+        },
         getStepClass(index) {
             const obj = {
                 current: this.activeIndex === index,
@@ -56,7 +61,7 @@ export default {
             return obj
         },
         openSignRequest(uuid) {
-            if (typeof window.ReactNativeWebView === 'undefined') throw new Error('Error getting object from React Native')
+            if (typeof window.ReactNativeWebView === 'undefined') throw new Error(this.$t('wizard.error.reactNative'))
             window.ReactNativeWebView.postMessage(JSON.stringify({
                 command: 'openSignRequest',
                 uuid: uuid
@@ -68,20 +73,20 @@ export default {
                 socket.onmessage = msg => {
                     const data = JSON.parse(msg.data)
                     if (data.signed) {
-                        // if user signs the reques 
+                        // if the user signs the request
                         resolve(data)
                         socket.close()
                     } else if(data.signed === false) {
-                        // If user closes the sign request
-                        reject(data)
+                        // If the user closes the sign request
+                        reject(this.$t('wizard.error.closed'))
                         socket.close()
                     }
                 }
                 socket.onclose = msg => {
-                    reject(msg)
+                    reject(this.$t('wizard.error.closed'))
                 }
                 socket.onerror = e => {
-                    reject(e)
+                    reject(this.$t('wizard.error.websocket'))
                     socket.close()
                 }
             })
@@ -111,12 +116,13 @@ export default {
                 }
                 socket.onmessage = msg => {
                     const data = JSON.parse(msg.data)
-                    if (data.error) reject(data)
+                    if (data.error) {
+                        reject(this.$t(`wizard.error.${data.error}`))
+                    }
                     if (data.id == 666) {
                         resolve(data)
                         socket.close()
                     }
-                    this.msg = data
                 }
                 socket.onclose = msg => {
                     reject(msg)
@@ -126,9 +132,24 @@ export default {
                 }
             })
         },
+        throwError(e) {
+            this.error = true
+            if (e.status === 403) e = this.$t('wizard.error.403')
+            this.msg = e
+            console.log(e)
+            this.$swal({
+                icon: 'error',
+                title: 'Oops...',
+                text: e,
+                footer: '<a href>Why do I have this issue?</a>'
+            })
+        },
         async next() {
+            this.msg = ''
             this.busy = true
             this.error = false
+
+            const headers = { headers: { Authorization: this.state.token } }
 
             switch(this.activeIndex) {
                 case 0:
@@ -139,19 +160,17 @@ export default {
                                 TransactionType: "SignIn"
                             }
                         }
-                        const res = await axios.post(`${this.endpoint}/payload`, payload)
+
+                        const res = await axios.post(`${this.endpoint}/payload`, payload, headers)
                         this.openSignRequest(res.data.uuid)
                         const status = await this.ws(res.data.refs.websocket_status)
-                        const result = await axios.get(`${this.endpoint}/payload/${status.payload_uuidv4}`)
+                        const result = await axios.get(`${this.endpoint}/payload/${status.payload_uuidv4}`, headers)
                         this.account = result.data.response.account
 
                         const test = await this.accountInfo(this.account)
-                        if (test.result.account_objects.length >= 1) throw new Error('There are account objects that prevents you from deleting this account')
-                        this.msg = test
+                        if (test.result.account_objects.length >= 1) throw new Error(this.$t('wizard.error.hasObjects'))
                     } catch(e) {
-                        this.error = true
-                        this.msg = e
-                        console.log(e)
+                        this.throwError(e)
                     }
                     break
                 case 1:
@@ -162,15 +181,14 @@ export default {
                                 TransactionType: "SignIn"
                             }
                         }
-                        const res = await axios.post(`${this.endpoint}/payload`, payload)
+                        const res = await axios.post(`${this.endpoint}/payload`, payload, headers)
                         this.openSignRequest(res.data.uuid)
                         const status = await this.ws(res.data.refs.websocket_status)
-                        const result = await axios.get(`${this.endpoint}/payload/${status.payload_uuidv4}`)
+                        const result = await axios.get(`${this.endpoint}/payload/${status.payload_uuidv4}`, headers)
+                        if (this.account === result.data.response.account) throw new Error(this.$t('wizard.error.equalAccounts'))
                         this.destination = result.data.response.account
                     } catch(e) {
-                        this.error = true
-                        this.msg = e
-                        console.log(e)
+                        this.throwError(e)
                     }
                     break
                 case 2:
@@ -184,15 +202,14 @@ export default {
                                 // DestinationTag: null
                             }
                         }
-                        const res = await axios.post(`${this.endpoint}/payload`, payload)
+                        const res = await axios.post(`${this.endpoint}/payload`, payload, headers)
                         this.openSignRequest(res.data.uuid)
                         const status = await this.ws(res.data.refs.websocket_status)
-                        const result = await axios.get(`${this.endpoint}/payload/${status.payload_uuidv4}`)
-                        this.msg = result.data.response.dispatched_result
+                        const result = await axios.get(`${this.endpoint}/payload/${status.payload_uuidv4}`, headers)
+                        if (result.data.response.dispatched_result !== 'tesSUCCESS') throw new Error(this.$t(`wizard.error.${result.data.response.dispatched_result}`))
+                        this.msg = this.$t('wizard.success')
                     } catch (e) {
-                        this.error = true
-                        console.log(e)
-                        this.msg = e
+                        this.throwError(e)
                     }
                     break
             }
@@ -203,7 +220,3 @@ export default {
     }
 }
 </script>
-
-<style scoped>
-
-</style>
