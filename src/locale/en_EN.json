@@ -6,7 +6,9 @@
         "list_header": "To continue you need:",
         "list_item_1": "The account you want to delete that has no obligations",
         "list_item_2": "A destination account",
-        "button": "I'm ready, continue"
+        "button": "I'm ready, continue",
+        "try_again": "Try again",
+        "error": "error getting token data"
     },
     "wizard": {
         "paymentOfAmount": "DELETE ME PLEASE!!! The payment of %{value%} %{token} has been sent",

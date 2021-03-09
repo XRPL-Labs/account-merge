@@ -19,8 +19,12 @@
                 {{ $t("start.button") }}
                 <fa :icon="['fas', 'arrow-right']"/>
             </a>
-            <a v-else class="shadow btn btn-lg btn-primary btn-block disabled" >
+            <a v-else-if="busy" class="shadow btn btn-lg btn-primary btn-block disabled" >
                 <Spinner />
+            </a>
+            <a v-else-if="error" class="shadow btn btn-lg btn-primary btn-block" @click="getTokenData()">
+                {{ $t("start.try_again") }}
+                <fa :icon="['fas', 'arrow-right']"/>
             </a>
         </div>
         <Alert v-if="error" type="danger" :msg="error"/>
@@ -39,35 +43,39 @@ export default {
     data() {
         return {
             ott: Object,
+            busy: true,
             ready: false,
-            test: 'test',
+            data: '',
             error: ''
         }
     },
     async mounted() {
         // Todo If token not avaiable try again with method
-        try {
-            const res = await axios({
-                method: 'get',
-                url: `${this.endpoint}/xapp/ott/${this.token}`
-            })
-            this.test = res.data
-        } catch(e) {
-            console.error(e)
-            this.error = e
-            this.$swal({
-                icon: 'error',
-                title: 'Oops...',
-                text: e,
-                footer: '<a href>Why do I have this issue?</a>'
-            })
-        }
-        this.ready = true
+        await this.getTokenData()
     },
     methods: {
+        async getTokenData () {
+            try {
+                const res = await axios({
+                    method: 'get',
+                    url: `${this.endpoint}/xapp/ott/${this.token}`
+                })
+                this.data = res.data
+                this.ready = true
+            } catch(e) {
+                console.error(e)
+                this.error = this.$t('start.error')
+                this.$swal({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: this.error
+                })
+            }
+            this.busy = false
+        },
         next() {
-            window.history.pushState('this.test', 'meta', '/wizard')
-            const popStateEvent = new PopStateEvent('popstate', { state: this.test })
+            window.history.pushState('this.data', 'state', '/wizard')
+            const popStateEvent = new PopStateEvent('popstate', { state: this.data })
             dispatchEvent(popStateEvent)
         }
     }
