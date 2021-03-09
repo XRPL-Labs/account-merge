@@ -140,8 +140,7 @@ export default {
             this.$swal({
                 icon: 'error',
                 title: 'Oops...',
-                text: e,
-                footer: '<a href>Why do I have this issue?</a>'
+                text: e
             })
         },
         async next() {

@@ -55,4 +55,12 @@ export default {
     height: 100%;
     overflow-y: auto;
 }
+.swal2-container.swal2-backdrop-show,
+.swal2-container.swal2-noanimation {
+    background: rgba(255,255,255,.4);
+}
+.swal2-popup {
+    box-shadow: 2px 2px 11px rgba(0,0,0,0.3);
+    border-radius: 10px;
+}
 </style>
