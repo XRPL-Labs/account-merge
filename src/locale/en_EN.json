@@ -11,7 +11,6 @@
         "error": "error getting token data"
     },
     "wizard": {
-        "paymentOfAmount": "DELETE ME PLEASE!!! The payment of %{value%} %{token} has been sent",
         "step_0": {
             "header": "Step 1",
             "body": "Select the account which you wish to delete",
@@ -31,7 +30,7 @@
         "error": {
             "reactNative": "this webpage is not supported",
             "failed": "Failed to fetch",
-            "closed": "closed a sign request",
+            "closed": "websocket closed",
             "websocket": "A problem with the websocket connection",
             "403": "Access denied 403",
             "hasObjects": "There are account objects that prevents you from deleting this account",
