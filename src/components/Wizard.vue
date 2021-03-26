@@ -17,8 +17,11 @@
                     </span>
                 </a>
             </li>
+            <a v-if="finished" @click="close()" class="d-block shadow py-1 btn-block text-white btn btn-lg btn-success mt-3">
+                {{ $t('wizard.success') }}
+            </a>
         </ul>
-        <Alert v-if="error || msg" type="danger" :msg="msg"/>
+        <!-- <Alert v-if="error || msg" type="danger" :msg="msg"/> -->
     </div>
 </template>
 
@@ -40,7 +43,8 @@ export default {
             error: false,
             msg: '',
             account: '',
-            destination: ''
+            destination: '',
+            finished: false,
         }
     },
     mounted() {
@@ -48,6 +52,11 @@ export default {
         axios.defaults = { headers: { Authorization: this.state.token } }
     },
     methods: {
+        close() {
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+                command: 'close'
+            }))
+        },
         changeIndex(index) {
             if (this.activeIndex > index) this.activeIndex = index
         },
@@ -78,7 +87,7 @@ export default {
                         socket.close()
                     } else if(data.signed === false) {
                         // If the user closes the sign request
-                        reject(this.$t('wizard.error.closed'))
+                        reject('')
                         socket.close()
                     }
                 }
@@ -134,6 +143,7 @@ export default {
         },
         throwError(e) {
             this.error = true
+            if (e === '') return
             if (e.status === 403) e = this.$t('wizard.error.403')
             this.msg = e
             console.log(e)
@@ -164,6 +174,7 @@ export default {
                         this.openSignRequest(res.data.uuid)
                         const status = await this.ws(res.data.refs.websocket_status)
                         const result = await axios.get(`${this.endpoint}/payload/${status.payload_uuidv4}`, headers)
+
                         this.account = result.data.response.account
 
                         const test = await this.accountInfo(this.account)
@@ -207,6 +218,7 @@ export default {
                         const result = await axios.get(`${this.endpoint}/payload/${status.payload_uuidv4}`, headers)
                         if (result.data.response.dispatched_result !== 'tesSUCCESS') throw new Error(this.$t(`wizard.error.${result.data.response.dispatched_result}`))
                         this.msg = this.$t('wizard.success')
+                        this.finished = true
                     } catch (e) {
                         this.throwError(e)
                     }
