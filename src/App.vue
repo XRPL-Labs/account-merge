@@ -1,4 +1,5 @@
 <template>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <div class="xapps-wrapper">
         <div class="container pt-2">
             <keep-alive>
@@ -57,10 +58,10 @@ export default {
 }
 .swal2-container.swal2-backdrop-show,
 .swal2-container.swal2-noanimation {
-    background: rgba(255,255,255,.4);
+    background: rgba(255,255,255,.4) !important;
 }
 .swal2-popup {
-    box-shadow: 2px 2px 11px rgba(0,0,0,0.3);
-    border-radius: 10px;
+    box-shadow: 2px 2px 11px rgba(0,0,0,0.3) !important;
+    border-radius: 10px !important;
 }
 </style>

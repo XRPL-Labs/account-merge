@@ -62,14 +62,10 @@ export default {
                 })
                 this.data = res.data
                 this.ready = true
+                this.error = false
             } catch(e) {
                 console.error(e)
                 this.error = this.$t('start.error')
-                this.$swal({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: this.error
-                })
             }
             this.busy = false
         },
