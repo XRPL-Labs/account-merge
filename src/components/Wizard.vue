@@ -49,7 +49,7 @@ export default {
     },
     mounted() {
         // axios defaults is not working
-        axios.defaults = { headers: { Authorization: this.state.token } }
+        axios.defaults = { headers: { Authorization: this.state.token, 'x-api-key': this.apikey } }
     },
     methods: {
         close() {
