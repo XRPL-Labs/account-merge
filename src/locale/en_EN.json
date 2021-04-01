@@ -1,40 +1,40 @@
 {
     "start": {
         "title": "Account Merge",
-        "subtitle": "Merge one account into another to retrieve the XRP reserve",
-        "description": "This xApp will help you merge two accounts in XUMM",
+        "subtitle": "Merge (delete) an on ledger XRP Ledger account and move funds to one of your other accounts, to retrieve the XRP reserve.",
+        "description": "This xApp will help you 'merge' two on ledger accounts accounts on the XRP Ledger",
         "list_header": "To continue you need:",
-        "list_item_1": "The account you want to delete that has no obligations",
+        "list_item_1": "The account you want to delete (that has no obligations or other ledger objects)",
         "list_item_2": "A destination account",
         "button": "I'm ready, continue",
         "try_again": "Try again",
-        "error": "error getting token data"
+        "error": "Error getting session data"
     },
     "wizard": {
         "step_0": {
             "header": "Step 1",
             "body": "Select the account which you wish to delete",
-            "button": "Select Account"
+            "button": "Select account"
         },
         "step_1": {
             "header": "Step 2",
-            "body": "Sign the destination account.",
-            "button": "Next Step"
+            "body": "Sign the destination account",
+            "button": "Next step"
         },
         "step_2": {
             "header": "Step 3",
-            "body": "Sign the delete account transaction",
-            "button": "Next Step"
+            "body": "Sign the 'AccountDelete' transaction",
+            "button": "Next step"
         },
-        "success": "Your account has been successfully merged",
+        "success": "Your funds have been migrated and your account has been successfully deleted",
         "error": {
-            "reactNative": "this webpage is not supported",
+            "reactNative": "This webpage is not supported",
             "failed": "Failed to fetch",
-            "closed": "websocket closed",
-            "websocket": "A problem with the websocket connection",
-            "403": "Access denied 403",
-            "hasObjects": "There are account objects that prevents you from deleting this account",
-            "equalAccounts": "The accounts you selected are the same",
+            "closed": "WebSocket closed",
+            "websocket": "Problem with the WebSocket connection",
+            "403": "Access denied (403)",
+            "hasObjects": "There are account objects that prevents you from deleting this account, like pending escrows, offers, signer lists, etc.",
+            "equalAccounts": "You selected the same account as source and destination account",
 
             "invalidParams": "One or more fields are specified incorrectly, or one or more required fields are missing.",
             "lgrNotFound": "The ledger specified by the ledger_hash or ledger_index does not exist, or it does exist but the server does not have it.",
