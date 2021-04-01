@@ -34,6 +34,7 @@
             "closed": "WebSocket closed",
             "websocket": "Problem with the WebSocket connection",
             "403": "Access denied (403)",
+            "404": "Server not found (404)",
             "hasObjects": "There are account objects that prevents you from deleting this account, like pending escrows, offers, signer lists, etc.",
             "equalAccounts": "You selected the same account as source and destination account",
 
