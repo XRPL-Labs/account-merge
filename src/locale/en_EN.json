@@ -28,6 +28,7 @@
         },
         "success": "Your funds have been migrated and your account has been successfully deleted",
         "error": {
+            "title": "Oops",
             "reactNative": "This webpage is not supported",
             "failed": "Failed to fetch",
             "closed": "WebSocket closed",

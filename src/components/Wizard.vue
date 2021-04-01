@@ -149,7 +149,7 @@ export default {
             console.log(e)
             this.$swal({
                 icon: 'error',
-                title: 'Oops...',
+                title: this.$t('wizard.error.title'),
                 text: e
             })
         },
