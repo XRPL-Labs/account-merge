@@ -197,6 +197,7 @@ export default {
                         const status = await this.ws(res.data.refs.websocket_status)
                         const result = await axios.get(`${this.endpoint}/payload/${status.payload_uuidv4}`, headers)
                         if (this.account === result.data.response.account) throw new Error(this.$t('wizard.error.equalAccounts'))
+                        const test = await this.accountInfo(result.data.response.account)
                         this.destination = result.data.response.account
                     } catch(e) {
                         this.throwError(e)
