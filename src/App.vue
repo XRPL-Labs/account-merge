@@ -1,6 +1,5 @@
 <template>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <div class="xapps-wrapper">
+    <div class="xapps-wrapper" >
         <div class="container pt-2">
             <keep-alive>
                 <component :state="state" :is="currentComponent" />
@@ -33,6 +32,15 @@ export default {
     computed: {
         currentComponent() {
             return routes[this.currentRoute] || Start
+        },
+        rootVarCss() {
+            return {
+                '--var-LIGHT': '#FFFFFF',
+                '--var-DARK': '#000000',
+                '--var-MOONLIGHT': '#181A21',
+                '--var-ROYAL': '#030B36',
+                // '--var-bg-color': `var(--var-${this.theme})`,
+            }
         }
     },
     mounted() {
@@ -56,7 +64,7 @@ export default {
 }
 .swal2-container.swal2-backdrop-show,
 .swal2-container.swal2-noanimation {
-    background: rgba(255,255,255,.4) !important;
+    /* background: rgba(255,255,255,.4) !important; */
 }
 .swal2-popup {
     box-shadow: 2px 2px 11px rgba(0,0,0,0.3) !important;
