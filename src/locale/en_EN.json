@@ -2,7 +2,7 @@
     "start": {
         "title": "Account Merge",
         "subtitle": "Merge (delete) an on ledger XRP Ledger account and move funds to one of your other accounts, to retrieve the XRP reserve.",
-        "description": "This xApp will help you 'merge' two on ledger accounts accounts on the XRP Ledger",
+        "description": "This xApp will help you 'merge' two accounts on the XRP Ledger",
         "list_header": "To continue you need:",
         "list_item_1": "The account you want to delete (that has no obligations or other ledger objects)",
         "list_item_2": "A destination account",
