@@ -195,7 +195,7 @@ export default {
                                 TransactionType: "AccountDelete",
                                 Account: this.account,
                                 Destination: this.destination,
-                                Fee: '2000000'
+                                Fee: '200000'
                                 // DestinationTag: null
                             }
                         }
